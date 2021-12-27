@@ -14,6 +14,8 @@ import lammps_logfile
 from glob import glob
 import pandas as pd
 
+import lammps_param_sweep
+
 class lammps_project:
     
     def __init__(self,template,geom_gen,params,project_name="lammps_calcs",metadata_file="metadata.txt",global_md_file="global_metadata.txt"):
@@ -284,7 +286,13 @@ class analyze_db:
     def load_dumpFile(self,filename):
         atom_obj=ase.io.read(filename,format="lammps-dump-text")
         return atom_obj
-    
+
+###################### Convert to ASE DB #####################################
+def to_AseDB(project):
+    return None
+
+
+   
 def write_lammps(fname,ase_obj):
     cell=np.array(ase_obj.get_cell())
     rx_=" ".join(map(str,cell[0,:]))
