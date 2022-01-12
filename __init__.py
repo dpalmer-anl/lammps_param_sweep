@@ -291,7 +291,12 @@ class analyze_db:
 def to_AseDB(project):
     return None
 
-
+def round_float_down(num):
+    num_str=str(num)
+    last_digit=int(num_str[-1])
+    if last_digit%2 !=0:
+        num_str[-1]=int(last_digit-1)
+    return float(num_str)
    
 def write_lammps(fname,ase_obj):
     cell=np.array(ase_obj.get_cell())
@@ -304,8 +309,8 @@ def write_lammps(fname,ase_obj):
     
     with open(fname,'w+') as f:
         skew=cell[1,0]
-        if np.isclose(cell[0,0]/2,skew,atol=1e-5):
-            skew-=1e-5
+        if np.abs(cell[0,0]/2)<np.abs(skew) and np.isclose(cell[0,0]/2,skew,atol=1e-5):
+            skew=round_float_down(cell[0,0]/2) #1e-5
         f.write(fname+ " (written by ASE)      \n\n")
         f.write(str(natom)+" 	 atoms \n")
         f.write("2 atom types \n")
@@ -326,3 +331,17 @@ def write_lammps(fname,ase_obj):
             pos=np.array(a.position)
             str_pos=" ".join(map(str,pos))
             f.write(str_pos+" \n")
+            
+            
+if __name__=="__main__":
+    import flatgraphene as fg
+    atoms_obj=a=2.529
+    sep=3.35
+    t=27.8
+    p_found, q_found, theta_comp = fg.twist.find_p_q(t)
+    atoms_obj=fg.twist.make_graphene(cell_type="hex",n_layer=2,
+                                        p=p_found,q=q_found,lat_con=0.0,a_nn=a/np.sqrt(3),sym=["B","Ti"],
+                                        mass=[12.01,12.02],sep=sep,h_vac=5.5)
+    
+    write_lammps("C:/Users/danpa/Documents/research/latte_tools/Lammps_DB/projects/benchmarks/coords27_8_new.data",atoms_obj)
+    
